@@ -29,14 +29,12 @@ actor TokenManager {
 }
 
 final class BotAuthService : Sendable {
-    private let appId: String
-    private let clientSecret: String
+    private let appId: String = Environment.get("APP_ID") ?? ""
+    private let clientSecret: String = Environment.get("APP_SECRET") ?? ""
     private let httpClient: any Client
     private let tokenManager = TokenManager()
     
-    init(appId: String, clientSecret: String, httpClient: any Client) {
-        self.appId = appId
-        self.clientSecret = clientSecret
+    init(httpClient: any Client) {
         self.httpClient = httpClient
     }
     
