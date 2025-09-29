@@ -68,14 +68,50 @@ check_port() {
     fi
 }
 
+# 函数：选择构建模式
+select_build_mode() {
+    echo "请选择构建模式:"
+    echo "1) release (生产环境)"
+    echo "2) debug (开发调试)"
+    
+    while true; do
+        read -p "请输入选择 (1 或 2): " choice
+        case $choice in
+            1)
+                BUILD_MODE="release"
+                echo "选择构建模式: release"
+                break
+                ;;
+            2)
+                BUILD_MODE="debug"
+                echo "选择构建模式: debug"
+                break
+                ;;
+            *)
+                echo "无效选择，请输入 1 或 2"
+                ;;
+        esac
+    done
+}
+
 # 函数：执行构建
 build_project() {
     echo "开始构建项目..."
     check_env_file
-    xcrun --toolchain swift swift build --swift-sdk x86_64-swift-linux-musl -c release
+    
+    # 选择构建模式
+    select_build_mode
+    
+    echo "构建配置:"
+    echo "  - 模式: $BUILD_MODE"
+    echo "  - SDK: x86_64-swift-linux-musl"
+    
+    # 执行构建命令
+    xcrun --toolchain swift swift build --swift-sdk x86_64-swift-linux-musl -c $BUILD_MODE
     
     if [ $? -eq 0 ]; then
         echo "构建成功完成!"
+        echo "可执行文件位置: .build/$BUILD_MODE/SF6_BOT"
     else
         echo "构建失败!" >&2
         exit 1
@@ -91,13 +127,13 @@ run_project() {
     check_port
     
     # 检查可执行文件是否存在
-    if [ ! -f .build/release/hello ]; then
+    if [ ! -f .build/release/SF6_BOT ]; then
         echo "错误: 可执行文件不存在，请先执行构建命令: $0 build" >&2
         exit 1
     fi
     
     echo "启动服务..."
-    ./hello --env production
+    ./SF6_BOT --env production
 }
 
 # 主程序

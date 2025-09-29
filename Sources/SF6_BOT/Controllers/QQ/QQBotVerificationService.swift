@@ -1,6 +1,6 @@
 //
 //  QQBotVerificationService.swift
-//  hello
+//  SF6_BOT
 //
 //  Created by ByteDance on 2025/9/27.
 //
@@ -10,14 +10,7 @@ import Crypto
 
 final class QQBotVerificationService {
     private let clientSecret: String = Environment.get("APP_SECRET") ?? ""
-    public func handleVerification(req: Request) throws -> QQBotVerificationResponse {
-        let callbackRequest = try req.content.decode(QQBotCallbackRequest.self)
-
-        // 只处理验证请求 (op == 13)
-        guard callbackRequest.op == 13 else {
-            throw Abort(.badRequest, reason: "非验证请求,op:\(callbackRequest.op)")
-        }
-        
+    public func handleVerification(callbackRequest: QQBotVerificationRequest) throws -> Response {
         guard let plainToken = callbackRequest.d.plain_token else {
             throw Abort(.badRequest, reason: "缺少plain_token")
         }
@@ -35,7 +28,12 @@ final class QQBotVerificationService {
             clientSecret: processedSecret
         )
         
-        return QQBotVerificationResponse(plain_token: plainToken, signature: responseSignature)
+        let response = Response(status: .accepted)
+        response.headers.add(name: "Content-Type", value: "application/json")
+        try response.content.encode(QQBotVerificationResponse(
+            plain_token: plainToken, signature: responseSignature
+        ))
+        return response
     }
     
     private func processSecret(_ secret: String) -> String {

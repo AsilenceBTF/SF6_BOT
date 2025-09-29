@@ -60,9 +60,6 @@ final class BotAuthService : Sendable {
             }
         }
         let token = try await promise.futureResult.get()
-        if let error = token as? any Error {
-            throw error
-        }
         return token
     }
     
@@ -78,7 +75,7 @@ final class BotAuthService : Sendable {
         }.get()
         
         guard response.status == .ok else {
-            throw Abort(.internalServerError, reason: "Failed to get access token: \(response.status)")
+            throw Abort(.internalServerError, reason: "getAppAccessToken:Failed to get access token: \(response.status)")
         }
         
         let authResponse = try response.content.decode(QQAuthResponse.self)

@@ -18,7 +18,7 @@ x-shared_environment: &shared_environment
   
 services:
   app:
-    image: hello:latest
+    image: SF6_BOT:latest
     build:
       context: .
     environment:

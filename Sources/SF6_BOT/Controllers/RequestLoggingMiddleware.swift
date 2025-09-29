@@ -7,9 +7,9 @@ final class RequestLoggingMiddleware: Middleware {
         // 1. 记录请求基本信息
         print("=== 收到请求 ===")
         print("时间: \(Date())")
-        print("方法: \(request.method.string)") // 例如 GET, POST :cite[4]
+        print("方法: \(request.method.rawValue)") // 例如 GET, POST :cite[4]
         print("路径: \(request.url.path)") // 完整的请求路径 :cite[1]
-        print("客户端IP: \(request.remoteAddress?.ipAddress)") // 客户端IP地址 :cite[1]
+        print("客户端IP: \(request.remoteAddress?.ipAddress ?? "")") // 客户端IP地址 :cite[1]
         
         // 2. 打印所有请求头 (可选，信息量可能较大)
         print("--- 请求头 ---")

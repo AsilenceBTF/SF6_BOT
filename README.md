@@ -1,4 +1,4 @@
-# hello
+# SF6_BOT
 
 💧 A project built with the Vapor web framework.
 

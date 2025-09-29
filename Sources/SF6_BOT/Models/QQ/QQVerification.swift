@@ -1,18 +1,18 @@
 //
 //  QQVerification.swift
-//  hello
+//  SF6_BOT
 //
 //  Created by ByteDance on 2025/9/27.
 //
 import Vapor
 
 // 定义请求和响应的数据结构
-struct QQBotCallbackRequest: Content {
-    let d: CallbackData
+struct QQBotVerificationRequest: Content {
+    let d: VerificationData
     let op: Int
 }
 
-struct CallbackData: Content {
+struct VerificationData: Content {
     let plain_token: String?
     let event_ts: String?
 }

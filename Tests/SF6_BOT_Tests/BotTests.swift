@@ -1,9 +1,11 @@
-@testable import hello
+@testable import SF6_BOT
 import VaporTesting
 import Testing
+import Fluent
 
 @Suite("App Tests")
-struct helloTests {
+struct SF6_BOT_Tests {
+    private let logger: Logger = Logger(label: "com.app.test")
     private let appId: String = Environment.get("APP_ID") ?? ""
     private let clientSecret: String = Environment.get("APP_SECRET") ?? ""
     
@@ -31,15 +33,27 @@ struct helloTests {
             print("token:\(token)")
         }
     }
-    
-    @Test func sendMsgTest() async throws {
+
+    @Test func frameDataText() async throws {
         try await withApp(configure: configure) { app in
-            let botAuth = BotAuthService(httpClient: app.client)
-            let openapi = BotOpenAPI(authService: botAuth, httpClient: app.client)
-            let authResponse = try await openapi.sendMessage(msg: "大家好")
-            print("id:\(authResponse.id)")
-            print("id:\(authResponse.timestamp)")
+            
+            let result = try await CharacterModel.query(on: app.db)
+                .join(CharacterAliasModel.self, on: \CharacterAliasModel.$characterID == \CharacterModel.$id)
+                .filter(CharacterAliasModel.self, \CharacterAliasModel.$aliasName == "老桑")
+                .first()
+
+            if let final_result = result {
+                print("*******name:\(final_result.name)")
+            }
         }
     }
     
+    
+    @Test func testEnv() async throws {
+        try await withApp(configure: configure) { app in
+            let a = Environment.get("OPENAPI_URL")
+            print("**********\(a)")
+        }
+
+    }
 }
