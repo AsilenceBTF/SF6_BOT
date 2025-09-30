@@ -101,14 +101,16 @@ final class MoveModel: @unchecked Sendable, Model {
     
     var cancelString: String {
         get {
-            if ["C", "SA", "SA1", "SA2", "SA3"].contains(cancel) {
+            if ["C", "SA", "SA1", "SA2", "SA3", "※"].contains(cancel) {
                 if (cancel == "C") {
                     return "可绿冲取消"
+                } else if (cancel == "※") {
+//                    return "可拳脚取消"
                 } else {
                     return "可\(cancel!)取消"
                 }
             }
-            return ""
+            return "不可取消"
         }
     }
     
@@ -118,7 +120,7 @@ final class MoveModel: @unchecked Sendable, Model {
     ///   - character: 角色模型，用于限定查询范围
     ///   - searchTerm: 搜索关键词，可能是招式名称、输入指令或英文名称
     /// - Returns: 匹配的招式模型，如果没有找到则返回nil
-    public static func getModelBySearchTerm(req: Request, character: CharacterModel, searchTerm: String) async throws -> MoveModel? {
+    public static func getModelBySearchTerm(db: any Database, character: CharacterModel, searchTerm: String) async throws -> MoveModel? {
         // 确保角色ID存在
         guard let characterId = character.id else {
             return nil
@@ -129,7 +131,7 @@ final class MoveModel: @unchecked Sendable, Model {
         
         // 并行执行多个查询，但按优先级处理结果
         // 1. 首先按中文名称搜索
-        if let model = try await MoveModel.query(on: req.db)
+        if let model = try await MoveModel.query(on: db)
             .filter(\MoveModel.$characterId == characterId)
             .filter(\MoveModel.$zhHansName == searchTerm) // 中文保持原样
             .first()
@@ -138,7 +140,7 @@ final class MoveModel: @unchecked Sendable, Model {
         }
         
         // 2. 按输入指令搜索（例如：5LP、2MP等）
-        if let model = try await MoveModel.query(on: req.db)
+        if let model = try await MoveModel.query(on: db)
             .filter(\MoveModel.$characterId == characterId)
             .filter(\MoveModel.$input == normalizedSearchTerm)
             .first()
@@ -147,7 +149,7 @@ final class MoveModel: @unchecked Sendable, Model {
         }
         
         // 3. 按英文名称搜索
-        if let model = try await MoveModel.query(on: req.db)
+        if let model = try await MoveModel.query(on: db)
             .filter(\MoveModel.$characterId == characterId)
             .filter(\MoveModel.$name == normalizedSearchTerm)
             .first()

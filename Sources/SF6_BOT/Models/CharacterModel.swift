@@ -21,6 +21,9 @@ final class CharacterAliasModel: @unchecked Sendable, Model {
     @Field(key: "character_id")
     var characterID: Int
     
+    @Field(key: "pinyin")
+    var pinyin: String?
+    
     init() { }
 }
 
@@ -34,10 +37,14 @@ final class CharacterModel: @unchecked Sendable, Model {
     @Field(key: "name")
     var name: String
     
-    static func getModelFromName(req: Request, character: String) async throws -> CharacterModel? {
-        return try await CharacterModel.query(on: req.db)
+    @Field(key: "zh_hans_name")
+    var chineseName: String
+    
+    static func getModelFromName(db: any Database, character: String) async throws -> CharacterModel? {
+        let pinyinStr = character.pinyin()
+        return try await CharacterModel.query(on: db)
             .join(CharacterAliasModel.self, on: \CharacterAliasModel.$characterID == \CharacterModel.$id)
-            .filter(CharacterAliasModel.self, \CharacterAliasModel.$aliasName == character)
+            .filter(CharacterAliasModel.self, \CharacterAliasModel.$pinyin == pinyinStr)
             .first()
     }
     

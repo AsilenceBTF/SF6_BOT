@@ -46,28 +46,35 @@ final class BotOpenAPI : @unchecked Sendable {
         }
     }
     
-    public func sendMessage(dispathRequest: QQDispatchMsgResult, msg: String) async throws -> SendMsgResponse {
-        let token = try await authService.getValidToken()
-        
-        let requestContent: SendMsgContent = SendMsgContent(
-            content: msg,
-            msg_type: 0,
-            event_id: dispathRequest.id ?? "",
-            msg_id: dispathRequest.d?.id ?? ""
-        )
-        
-        let groupOpenid = dispathRequest.d?.groupOpenid ?? ""
-        
-        let response = try await httpClient.post(URI(string: baseURL + "/v2/groups/\(groupOpenid)/messages")) { postRequest in
-            postRequest.headers.add(name: "Authorization", value: "QQBot \(token)")
-            try postRequest.content.encode(requestContent, as: .json)
-        }.get()
-        
-        guard response.status == .ok else {
-            throw Abort(.internalServerError, reason: "sendMessage:Failed to get access token: \(response.status)")
+    public func sendMessage(dispathRequest: QQDispatchMsgResult, msg: String) async -> SendMsgResponse? {
+        do {
+            let token = try await authService.getValidToken()
+            
+            logger.debug("sendMessage:\(msg)")
+            
+            let requestContent: SendMsgContent = SendMsgContent(
+                content: msg,
+                msg_type: 0,
+                event_id: dispathRequest.id ?? "",
+                msg_id: dispathRequest.d?.id ?? ""
+            )
+            
+            let groupOpenid = dispathRequest.d?.groupOpenid ?? ""
+            
+            let response = try await httpClient.post(URI(string: baseURL + "/v2/groups/\(groupOpenid)/messages")) { postRequest in
+                postRequest.headers.add(name: "Authorization", value: "QQBot \(token)")
+                try postRequest.content.encode(requestContent, as: .json)
+            }.get()
+            
+            guard response.status == .ok else {
+                throw Abort(.internalServerError, reason: "sendMessage:Failed to get access token: \(response.status)")
+            }
+            
+            let authResponse = try response.content.decode(SendMsgResponse.self)
+            return authResponse
+        } catch {
+            logger.error("sendMsg Error:\(error)")
+            return nil
         }
-        
-        let authResponse = try response.content.decode(SendMsgResponse.self)
-        return authResponse
     }
 }

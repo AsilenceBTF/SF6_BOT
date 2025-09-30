@@ -15,12 +15,12 @@ struct QQDispatchMsgResult : Content {
     // event type
     let t: String?
     // event real content
-    let d: DispatchMsgData?
+    var d: DispatchMsgData?
 }
 
 struct DispatchMsgData: Content {
     let id: String?
-    let content: String?
+    var content: String?
     let timestamp: String?
     let author: DispatchAuthor?
     let groupId: String?
