@@ -28,6 +28,9 @@ let package = Package(
                 .product(name: "Fluent", package: "fluent"),
                 .product(name: "FluentMySQLDriver", package: "fluent-mysql-driver")
             ],
+            resources: [
+                .process("Resources") 
+            ],
             swiftSettings: swiftSettings
         ),
         .testTarget(

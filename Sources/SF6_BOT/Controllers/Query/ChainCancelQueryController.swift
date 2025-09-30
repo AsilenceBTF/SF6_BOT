@@ -17,7 +17,7 @@ final class ChainCancelQueryController : BaseQueryProtocol {
     func handle(req: Request, qqMSg: QQDispatchMsgResult, params: [String]) async throws -> String {
         let queryResult = await query(req: req, params: params)
         if let errorMsg = queryResult.errorMessage {
-            _ = try await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: errorMsg)
+            _ = await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: errorMsg)
             return errorMsg
         } else {
             var desc = ""
@@ -27,7 +27,7 @@ final class ChainCancelQueryController : BaseQueryProtocol {
             } else {
                 desc = "\(queryResult.character?.chineseName ?? "")没有可以绿冲取消的拳脚"
             }
-            _ = try await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: desc)
+            _ = await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: desc)
             return desc
         }
     }

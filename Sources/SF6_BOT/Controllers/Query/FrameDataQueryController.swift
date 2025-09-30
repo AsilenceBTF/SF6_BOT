@@ -16,12 +16,12 @@ final class FrameDataQueryController : BaseQueryProtocol {
     func handle(req: Request, qqMSg: QQDispatchMsgResult, params: [String]) async throws -> String {
         let queryResult = await query(req: req, params: params)
         if let errorMsg = queryResult.errorMessage {
-            _ = try await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: errorMsg)
+            _ = await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: errorMsg)
             return errorMsg
         } else {
             var desc = "\n角色:\(queryResult.character?.chineseName ?? "")"
             desc += " " + (queryResult.move?.description ?? "")
-            _ = try await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: desc)
+            _ = await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: desc)
             return desc
         }
     }

@@ -10,6 +10,8 @@ public func configure(_ app: Application) async throws {
        app.environment == .testing {
         app.middleware.use(RequestLoggingMiddleware())
     }
+
+    try ChinesePinyinConverter.initialize(fileName: "unicode_to_hanyu_pinyin")
     
     let botAuthService = BotAuthService(httpClient: app.client)
     BotOpenAPI.configure(authService: botAuthService, httpClient: app.client)

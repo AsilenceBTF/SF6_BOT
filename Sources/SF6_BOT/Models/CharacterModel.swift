@@ -41,7 +41,7 @@ final class CharacterModel: @unchecked Sendable, Model {
     var chineseName: String
     
     static func getModelFromName(db: any Database, character: String) async throws -> CharacterModel? {
-        let pinyinStr = character.pinyin()
+        let pinyinStr = character.pinyin
         return try await CharacterModel.query(on: db)
             .join(CharacterAliasModel.self, on: \CharacterAliasModel.$characterID == \CharacterModel.$id)
             .filter(CharacterAliasModel.self, \CharacterAliasModel.$pinyin == pinyinStr)

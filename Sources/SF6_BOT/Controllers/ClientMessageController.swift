@@ -11,6 +11,7 @@ import Fluent
 enum CommandType: String {
     case frameDataQuery = "帧数查询"
     case wantFight = "约战"
+    case waitFightMenu = "待战列表"
     case chainCancelQuery = "可绿冲取消"
     case saCancelQuery = "可sa取消"
     case menuQuery = "菜单"
@@ -24,9 +25,10 @@ enum CommandType: String {
         get {
             var desc = "\n1./帧数查询 角色名 指令或拳脚\n"
             desc += "2./约战(测试中)\n"
-            desc += "3./可绿冲取消 角色名"
-            desc += "4./可SA取消 角色名"
-            desc += "5./菜单(显示帮助菜单)"
+            desc += "3./待战列表\n"
+            desc += "4./可绿冲取消 角色名\n"
+            desc += "5./可SA取消 角色名\n"
+            desc += "6./菜单(显示帮助菜单)"
             return desc
         }
     }
@@ -46,6 +48,12 @@ final class ClientMessageController {
         
         switch commondType {
             
+        case .wantFight:
+            returnMsg = try await figherMatch.handle(req: req, qqMSg: dispatchResult, params: params)
+            
+        case .waitFightMenu:
+            returnMsg = ""
+            
         case .frameDataQuery:
             returnMsg = try await frameDataQuery.handle(req: req, qqMSg: dispatchResult, params: params)
             
@@ -55,15 +63,12 @@ final class ClientMessageController {
         case .saCancelQuery:
             returnMsg = try await saCancelQuery.handle(req: req, qqMSg: dispatchResult, params: params)
             
-        case .wantFight:
-            returnMsg = try await figherMatch.handle(req: req, qqMSg: dispatchResult, params: params)
-            
         case .menuQuery:
-            _ = try await BotOpenAPI.shared.sendMessage(dispathRequest: dispatchResult, msg: CommandType.menuString)
+            _ = await BotOpenAPI.shared.sendMessage(dispathRequest: dispatchResult, msg: CommandType.menuString)
             returnMsg = CommandType.menuString
             
         case .none:
-            _ = try await BotOpenAPI.shared.sendMessage(dispathRequest: dispatchResult, msg: "指令错误，使用'/菜单'查看帮助")
+            _ = await BotOpenAPI.shared.sendMessage(dispathRequest: dispatchResult, msg: "指令错误，使用'/菜单'查看帮助")
             returnMsg = "指令错误，使用'/菜单'查看帮助"
         }
         
@@ -75,15 +80,6 @@ final class ClientMessageController {
 }
 
 extension String {
-    func pinyin() -> String {
-        let mutableString = NSMutableString(string: self) as CFMutableString
-        CFStringTransform(mutableString, nil, kCFStringTransformToLatin, false)
-        CFStringTransform(mutableString, nil, kCFStringTransformStripCombiningMarks, false)
-        var result = mutableString as String
-        result = result.replacingOccurrences(of: " ", with: "")
-        return result
-    }
-    
     // 解析指令
     static func parseCommandType(content: String?) -> (CommandType, [String]) {
         // 小写
