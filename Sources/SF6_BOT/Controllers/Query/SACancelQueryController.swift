@@ -14,10 +14,10 @@ final class SACancelQueryController : BaseQueryProtocol {
         var errorMessage: String?
     }
     
-    func handle(req: Request, qqMSg: QQDispatchMsgResult, params: [String]) async throws -> String {
+    func handle(req: Request, content: any Content, params: [String]) async throws -> String {
         let queryResult = await query(req: req, params: params)
         if let errorMsg = queryResult.errorMessage {
-            _ = await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: errorMsg)
+            BotOpenAPIManager.defaultAPI.sendMessage(content: content, msg: errorMsg)
             return errorMsg
         } else {
             var desc = ""
@@ -27,7 +27,7 @@ final class SACancelQueryController : BaseQueryProtocol {
             } else {
                 desc = "\(queryResult.character?.chineseName ?? "")没有可以SA取消的拳脚"
             }
-            _ = await BotOpenAPI.shared.sendMessage(dispathRequest: qqMSg, msg: desc)
+            BotOpenAPIManager.defaultAPI.sendMessage(content: content, msg: desc)
             return desc
         }
     }

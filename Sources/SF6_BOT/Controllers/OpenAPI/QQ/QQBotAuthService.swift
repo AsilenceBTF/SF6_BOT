@@ -28,7 +28,7 @@ actor TokenManager {
     }
 }
 
-final class BotAuthService : Sendable {
+final class QQBotAuthService : Sendable {
     private let appId: String = Environment.get("APP_ID") ?? ""
     private let clientSecret: String = Environment.get("APP_SECRET") ?? ""
     private let httpClient: any Client

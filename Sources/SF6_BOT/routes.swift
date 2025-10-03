@@ -9,9 +9,13 @@ func routes(_ app: Application) throws {
             let verificationService = QQBotVerificationService()
             return try verificationService.handleVerification(callbackRequest: callbackRequest)
         case 0:
-            return try await ClientMessageController().handleDispatchMessage(req: req)
+            return try await ClientMessageController().handleQQDispatchMessage(req: req)
         default:
             return Response(status: .notImplemented)
         }
+    }
+    
+    app.post("recmsg", "napcat") { req -> Response in
+        return try await ClientMessageController().handleNapCatDispatchMessage(req: req)
     }
 }

@@ -26,14 +26,6 @@ struct SF6_BOT_Tests {
         }
     }
     
-    @Test func botAuthTest() async throws {
-        try await withApp(configure: configure) { app in
-            let botAuth = BotAuthService(httpClient: app.client)
-            let token = try await botAuth.getValidToken()
-            print("token:\(token)")
-        }
-    }
-
     @Test func frameDataText() async throws {
         try await withApp(configure: configure) { app in
             let result = try await CharacterModel.query(on: app.db)

@@ -15,4 +15,4 @@ docker image ls
 # 构建历史
 docker history ID
 # compose运行
-+docker-compose up -d
+docker-compose up -d

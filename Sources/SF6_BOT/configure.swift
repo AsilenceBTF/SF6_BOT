@@ -4,17 +4,25 @@ import FluentMySQLDriver
 
 // configures your application
 public func configure(_ app: Application) async throws {
-    // uncomment to serve files from /Public folder
-    // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     if app.environment == .development ||
        app.environment == .testing {
         app.middleware.use(RequestLoggingMiddleware())
     }
+    
+    app.middleware.use(RequestPerformanceMiddleware.shared)
 
     try ChinesePinyinConverter.initialize(fileName: "unicode_to_hanyu_pinyin")
     
-    let botAuthService = BotAuthService(httpClient: app.client)
-    BotOpenAPI.configure(authService: botAuthService, httpClient: app.client)
+    // QQ OpenAPI Config
+    let botAuthService = QQBotAuthService(httpClient: app.client)
+    QQBotOpenAPI.configure(authService: botAuthService, httpClient: app.client)
+    
+    // NapCat OpenAPI Config
+    let napCatAuthService = NapCatAuthService()
+    NapCatOpenAPI.configure(authService: napCatAuthService, httpClient: app.client)
+    
+    // Config Default API
+    BotOpenAPIManager.configDefault(API: NapCatOpenAPI.shared)
     
     // config mysql
     let dataBase: String = Environment.get("MYSQL_NAME") ?? ""

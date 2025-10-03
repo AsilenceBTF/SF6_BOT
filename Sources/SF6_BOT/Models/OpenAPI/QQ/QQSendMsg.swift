@@ -7,12 +7,7 @@
 
 import Vapor
 
-struct SendMsgResponse: Content {
-    let id: String
-    let timestamp: String
-}
-
-struct SendMsgContent: Content {
+struct QQSendMsgContent: Content {
     let content: String
     let msg_type: Int
     let event_id: String

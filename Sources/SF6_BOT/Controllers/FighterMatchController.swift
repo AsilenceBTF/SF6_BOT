@@ -7,7 +7,7 @@
 import Vapor
 
 final class FighterMatchController {
-    func handle(req: Request, qqMSg: QQDispatchMsgResult, params: [String]) async throws -> String {
+    func handle(req: Request, content: any Content, params: [String]) async throws -> String {
         return ""
     }
 }
