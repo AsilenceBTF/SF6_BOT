@@ -14,3 +14,5 @@ docker ps --format "table {{.Names}}\t{{.Ports}}\t{{.ID}}"
 docker image ls
 # 构建历史
 docker history ID
+# compose运行
++docker-compose up -d

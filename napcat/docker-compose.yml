@@ -5,9 +5,14 @@ services:       # 定义所有要运行的服务容器
         - NAPCAT_UID=${NAPCAT_UID}
         - NAPCAT_GID=${NAPCAT_GID}
     ports:
-        - 3000:3000
+        # 只映射宿主机的3001到容器的3001，用于容器监听
         - 3001:3001
+        # 保留6099端口映射
         - 6099:6099
+    # 不映射3000端口，而是通过网络别名和特殊网络配置实现容器与宿主机通信
+    extra_hosts:
+        # 添加主机名映射，让容器可以通过特定主机名访问宿主机
+        - "host.docker.internal:host-gateway"
     volumes:
         - /app/.config/QQ:/app/.config/QQ
         - /app/napcat/config:/app/napcat/config
