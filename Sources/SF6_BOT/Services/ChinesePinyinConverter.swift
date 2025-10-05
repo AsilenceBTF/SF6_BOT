@@ -79,7 +79,7 @@ public class ChinesePinyinConverter {
                 result.append(String(character))
             } else {
                 // 使用第一个拼音（或多个拼音用逗号连接）
-                result.append(pinyins.joined(separator: ","))
+                result.append(pinyins.first!)
             }
         }
         

@@ -39,29 +39,15 @@ struct SF6_BOT_Tests {
         }
     }
     
-    // 测试拼音查找
+    // 测试拼音
     @Test func testPinyin() async throws {
-        let testStrs = [
-            "Ken",
-            "JP",
-            "jp",
-            "zhuli",
-            "sang",
-            "yujia",
-            "YUJIA",
-            "愈加",
-            "含助理",
-            "维嘉"
-        ]
         try await withApp(configure: configure) { app in
-            print("开始测试拼音查找")
-            for testStr in testStrs {
-                if let c = try await CharacterModel.getModelFromName(db: app.db, character: testStr) {
-                    print("查找成功-\(testStr):\(c.chineseName)")
-                } else {
-                    print("查找失败-\(testStr)")
-                }
+            print("************开始测试拼音")
+            let c = try await CharacterModel.query(on: app.db).all()
+            for xc in c {
+                print("原名:\(xc.chineseName) Pinyin:\(xc.chineseName.pinyin)")
             }
+            print("************完成测试拼音")
         }
     }
 

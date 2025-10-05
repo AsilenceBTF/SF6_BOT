@@ -4,12 +4,15 @@ import FluentMySQLDriver
 
 // configures your application
 public func configure(_ app: Application) async throws {
+    app.http.server.configuration.hostname = "0.0.0.0"
     if app.environment == .development ||
        app.environment == .testing {
+        // 请求测试日志
         app.middleware.use(RequestLoggingMiddleware())
     }
     
-    app.middleware.use(RequestPerformanceMiddleware.shared)
+    // 注册性能埋点
+//    app.middleware.use(RequestPerformanceMiddleware.shared)
 
     try ChinesePinyinConverter.initialize(fileName: "unicode_to_hanyu_pinyin")
     
@@ -33,6 +36,12 @@ public func configure(_ app: Application) async throws {
     let config = MySQLConfiguration(hostname: "127.0.0.1", port: 3306,username: "ltl", password: password, database: dataBase, tlsConfiguration: tls)
     app.databases.use(.mysql(configuration: config), as: .mysql)
 
+    // 添加数据库迁移
+    try await app.autoMigrate()
+    
+    // 启动战斗匹配清理服务
+    app.matchesCleanupService.start()
+    
     // register routes
     try routes(app)
 }

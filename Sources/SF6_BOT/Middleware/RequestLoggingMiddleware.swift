@@ -4,45 +4,68 @@ import Foundation
 final class RequestLoggingMiddleware: Middleware {
     func respond(to request: Request, chainingTo next: any Responder) -> EventLoopFuture<Response> {
         
-        // 1. 记录请求基本信息
-        request.logger.debug("=== 收到请求 ===")
-        request.logger.debug("时间: \(Date())")
-        request.logger.debug("方法: \(request.method.rawValue)") // 例如 GET, POST :cite[4]
-        request.logger.debug("路径: \(request.url.path)") // 完整的请求路径 :cite[1]
-        request.logger.debug("客户端IP: \(request.remoteAddress?.ipAddress ?? "")") // 客户端IP地址 :cite[1]
+        // 记录请求基本信息
+        request.logger.info("=== 收到请求 ===")
+        request.logger.info("时间: \(Date())")
+        request.logger.info("方法: \(request.method.rawValue)")
+        request.logger.info("路径: \(request.url.path)")
+        request.logger.info("客户端IP: \(request.remoteAddress?.ipAddress ?? "")")
         
-        // 2. 打印所有请求头 (可选，信息量可能较大)
-        request.logger.debug("--- 请求头 ---")
+        // 打印所有请求头
+        request.logger.info("--- 请求头 ---")
         for header in request.headers {
-            request.logger.debug("\(header.name): \(header.value)")
-        } // 参考了HTTPHeaders的访问方式 :cite[1]:cite[9]
+            request.logger.info("\(header.name): \(header.value)")
+        }
         
-        // 3. 尝试获取并打印路由参数
+        // 尝试获取并打印路由参数
         if !request.parameters.getCatchall().isEmpty {
-            request.logger.debug("--- 路由参数 ---")
-            request.logger.debug("\(request.parameters.getCatchall())")
-        } // 参考了路由参数的获取 :cite[1]:cite[4]:cite[9]
+            request.logger.info("--- 路由参数 ---")
+            request.logger.info("\(request.parameters.getCatchall())")
+        }
         
-        // 4. 尝试获取并打印查询字符串参数
+        // 尝试获取并打印查询字符串参数
         if let urlQuery = request.url.query {
-            request.logger.debug("--- 查询参数 ---")
-            request.logger.debug("原始查询字符串: \(urlQuery)")
-            // 可以继续添加其他预期的查询参数
-        } // 参考了查询参数的获取 :cite[3]:cite[6]:cite[8]
+            request.logger.info("--- 查询参数 ---")
+            request.logger.info("原始查询字符串: \(urlQuery)")
+        }
         
-        // 5. (可选) 记录请求体 - 对于非GET请求且内容不大的情况
-        if request.method != .GET, let bodyData = request.body.data {
-            request.logger.debug("--- 请求体 (原始数据，前1024字节) ---")
+        // 根据请求类型决定处理流程
+        if request.method != .GET {
+            // 非GET请求：先收集请求体再继续处理
+            return request.body.collect().flatMap { _ in
+                // 记录请求体信息
+                self.logRequestBody(request)
+                
+                // 只调用一次next.respond，确保不会多次转发
+                return self.forwardRequest(request, to: next)
+            }
+        } else {
+            // GET请求：直接记录并继续处理
+            request.logger.info("--- 请求体 ---")
+            request.logger.info("GET请求通常不包含请求体")
+            request.logger.info("==================")
+            
+            // 只调用一次next.respond，确保不会多次转发
+            return self.forwardRequest(request, to: next)
+        }
+    }
+    
+    // 辅助方法：记录请求体
+    private func logRequestBody(_ request: Request) {
+        if let bodyData = request.body.data {
+            request.logger.info("--- 请求体 (原始数据，前1024字节) ---")
             let bodyPreview = String(data: Data(bodyData.readableBytesView.prefix(1024)), encoding: .utf8) ?? "无法解析为UTF-8"
-            request.logger.debug("\(bodyPreview)")
-        } // 参考了请求体数据的访问 :cite[1]:cite[9]
-        
-        request.logger.debug("==================")
-        
-        // 将请求传递给下一个中间件（或最终的路由处理程序）并获取响应
+            request.logger.info("\(bodyPreview)")
+        } else {
+            request.logger.info("--- 请求体 ---\n无法获取请求体数据")
+        }
+        request.logger.info("==================")
+    }
+    
+    // 辅助方法：转发请求并记录响应状态
+    private func forwardRequest(_ request: Request, to next: any Responder) -> EventLoopFuture<Response> {
         return next.respond(to: request).map { response in
-            // 这里还可以选择打印响应信息，如状态码
-            request.logger.debug("请求处理完毕，状态码: \(response.status.code)")
+            request.logger.info("请求处理完毕，状态码: \(response.status.code)")
             return response
         }
     }
