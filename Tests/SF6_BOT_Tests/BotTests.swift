@@ -79,6 +79,17 @@ struct SF6_BOT_Tests {
             })
         }
     }
+    
+    // mysql测试
+    @Test func testQQUserModel() async throws {
+        try await withApp(configure: configure) { app in
+            sleep(3)
+            let newUser = QQUserModel()
+            newUser.userId = 3415177008
+            newUser.nikeName = "瓜森塞今晚吃了吗？"
+            try await newUser.save(on: app.db)
+        }
+    }
 }
 
 

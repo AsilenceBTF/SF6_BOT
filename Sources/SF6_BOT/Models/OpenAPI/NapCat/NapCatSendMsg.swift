@@ -7,7 +7,7 @@
 import Vapor
 
 struct NapCatSendMsg : Content {
-    let group_id: Int?
-    let user_id: Int?
+    let group_id: Int64?
+    let user_id: Int64?
     let message: String?
 }

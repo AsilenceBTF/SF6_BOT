@@ -90,7 +90,7 @@ final class ClientMessageController {
         .split(separator: ",")
         .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
     
-    private let napcatUid = Int((Environment.get("ONEBOT_BOT_USER_ID") ?? "")) ?? 0
+    private let napcatUid = Int64((Environment.get("ONEBOT_BOT_USER_ID") ?? "")) ?? 0
     
     public func handleQQDispatchMessage(req: Request) async throws -> Response {
         let dispatchResult = try req.content.decode(QQDispatchMsgResult.self)
@@ -166,7 +166,7 @@ final class ClientMessageController {
 }
 
 extension String {
-    static func napCatCQString(userId: Int) -> String {
+    static func napCatCQString(userId: Int64) -> String {
         return "[CQ:at,qq=\(userId)]"
     }
     
@@ -177,7 +177,7 @@ extension String {
             return (.ignore, [])
         }
         
-        let botUID: Int = Int((Environment.get("ONEBOT_BOT_USER_ID") ?? "")) ?? 0
+        let botUID: Int64 = Int64((Environment.get("ONEBOT_BOT_USER_ID") ?? "")) ?? 0
         if (botUID == 0) {
             return (.ignore, [])
         }
@@ -238,7 +238,7 @@ extension String {
         let trimmedContent = lowercaseContent.trimmingCharacters(in: .whitespacesAndNewlines)
         
         // 检查是否包含@机器人标记
-        let botUID: Int = Int((Environment.get("ONEBOT_BOT_USER_ID") ?? "")) ?? 0
+        let botUID: Int64 = Int64((Environment.get("ONEBOT_BOT_USER_ID") ?? "")) ?? 0
         let atCommond = napCatCQString(userId: botUID)
         let containsAt = content.contains(atCommond)
         

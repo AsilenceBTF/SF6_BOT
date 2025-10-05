@@ -14,7 +14,7 @@ final class QQUserModel : Model, @unchecked Sendable {
     var id: Int?
     
     @Field(key: "user_id")
-    var userId: Int
+    var userId: Int64
     
     @Field(key: "nike_name")
     var nikeName: String

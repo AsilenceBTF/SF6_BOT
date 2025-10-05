@@ -10,12 +10,12 @@ import Vapor
 // OneBot 11 协议基础消息结构
 struct OneBotMessage: Content {
     let time: Int64
-    let self_id: Int
+    let self_id: Int64
     let post_type: String
     let message_type: String?
     let sub_type: String?
-    let user_id: Int?
-    let group_id: Int?
+    let user_id: Int64?
+    let group_id: Int64?
     let message_id: Int
     let message: String?
     let raw_message: String
@@ -46,7 +46,7 @@ struct OneBotMessageSegment: Content {
 
 // 发送者信息
 struct OneBotSender: Content {
-    let user_id: Int
+    let user_id: Int64
     let nickname: String
     let card: String?
     let role: String?
@@ -59,7 +59,7 @@ struct OneBotSender: Content {
 
 // 匿名信息
 struct OneBotAnonymous: Content {
-    let id: Int?
+    let id: Int64?
     let name: String?
     let flag: String?
 }
@@ -198,20 +198,6 @@ struct OneBotTextElement: Content {
     let atRoleColor: Int
     let atRoleName: String
     let needNotify: Int
-}
-
-// 发送消息请求
-struct OneBotSendMessageRequest: Content {
-    let message_type: String
-    let user_id: String?
-    let group_id: String?
-//    let message: AnyCodable
-    let auto_escape: Bool?
-    let reply: String?
-    let at_sender: Bool?
-    let at_all: Bool?
-    let face: Int?
-    let font: Int?
 }
 
 // 发送消息响应

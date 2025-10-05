@@ -19,13 +19,13 @@ final class FighterMatchesModel : Model, @unchecked Sendable {
     var id: Int?
     
     @Field(key: "first_user_id")
-    var firstUID: Int
+    var firstUID: Int64
     
     @Field(key: "second_user_id")
-    var secondUID: Int?
+    var secondUID: Int64?
     
     @Field(key: "group_id")
-    var groupId: Int
+    var groupId: Int64
     
     @Field(key: "character_id")
     var characterID: Int?
