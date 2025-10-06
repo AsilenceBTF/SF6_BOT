@@ -78,17 +78,17 @@ final class ClientMessageController {
     private let figherMatch: FighterMatchController = FighterMatchController()
     private let openAPI: any BotOpenAPI = QQBotOpenAPI.shared
     
-    // user_id白名单
-    private let userWhiteList: [Int] = 
-        (Environment.get("ONEBOT_USER_WHITE_LIST") ?? "")
+    // 用户黑名单
+    private let userBlackList: [Int64] = 
+        (Environment.get("ONEBOT_USER_BLACK_LIST") ?? "")
         .split(separator: ",")
-        .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+        .compactMap { Int64($0.trimmingCharacters(in: .whitespaces)) }
     
-    // group_id白名单
-    private let groupWhiteList: [Int] = 
-        (Environment.get("ONEBOT_GROUP_WHITE_LIST") ?? "")
+    // 群组黑名单
+    private let groupBlackList: [Int64] = 
+        (Environment.get("ONEBOT_GROUP_BLACK_LIST") ?? "")
         .split(separator: ",")
-        .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+        .compactMap { Int64($0.trimmingCharacters(in: .whitespaces)) }
     
     private let napcatUid = Int64((Environment.get("ONEBOT_BOT_USER_ID") ?? "")) ?? 0
     
@@ -110,13 +110,16 @@ final class ClientMessageController {
             return Response(status: .accepted)
         }
         
-//        // 白名单之外的用户
-//        guard (userWhiteList.contains { $0 == dispatchResult.user_id } ||
-//               groupWhiteList.contains { $0 == dispatchResult.group_id }) else {
-//            // 不在白名单中的处理
-//            return Response(status: .accepted)
-//        }
-
+        // 检查用户ID是否在黑名单中
+        if let userId = dispatchResult.user_id, userBlackList.contains(userId) {
+            return Response(status: .accepted)
+        }
+        
+        // 检查群组ID是否在黑名单中
+        if let groupId = dispatchResult.group_id, groupBlackList.contains(groupId) {
+            return Response(status: .accepted)
+        }
+        
         let (commondType, params) = String.parseNapCatCommandType(content: dispatchResult.message)
         
         let returnMsg = try await handleDispatchCommond(req: req, content: dispatchResult, commondType: commondType, params: params)
